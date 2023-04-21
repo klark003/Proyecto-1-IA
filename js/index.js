@@ -1,36 +1,64 @@
 document.addEventListener("DOMContentLoaded", () => {
-    let environment = [
-        [0, 5, 3, 1, 1, 1, 1, 1, 1, 1],
-        [0, 1, 0, 0, 1, 0, 0, 0, 1, 1],
-        [0, 1, 1, 0, 3, 5, 1, 0, 2, 0],
-        [0, 1, 1, 1, 3, 1, 1, 1, 1, 0],
-        [6, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [1, 1, 4, 1, 1, 1, 1, 1, 1, 0],
-        [1, 1, 0, 4, 4, 0, 0, 1, 1, 5],
-        [1, 1, 0, 0, 1, 1, 0, 1, 1, 0],
-        [0, 0, 0, 0, 1, 1, 5, 0, 6, 0],
-        [1, 1, 1, 6, 1, 1, 0, 1, 1, 1]],
+
+    let environment = [],
         matrix = [],
         html = "";
 
-    for (let i = 0; i < 10; i++) {
-        matrix.push([]);
-        html += "<tr>";
-        for (let j = 0; j < 10; j++) {
-            matrix[i].push(new Cell(i, j, environment[i][j]));
-            if (environment[i][j] > 1) {
-                html += `<td id="cell${i}-${j}"><img src="img/${environment[i][j]}.webp" width="50px" height="50px"></td>`
-            } else {
-                html += `<td id="cell${i}-${j}" style="background-color: ${environment[i][j] == 1 ? "black" : "white"};"></td>`
-            }
+    /**
+     * Carga el archivo 
+     * @param {Event} e 
+     * @returns 
+     */
+    function readFile(e) {
+        environment = [];
+        var file = e.target.files[0];
+        if (!file) {
+            return;
         }
-        html += "</tr>";
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            loadEnvironment(e.target.result.split("\r\n"));
+        };
+        reader.readAsText(file);
     }
-    document.getElementById("matrix").innerHTML = html;
 
-    document.getElementById("btn1").addEventListener("click", () => {
-        searchBFS();
-    })
+
+
+    /**
+     * Carga el entorno en la vista
+     * @param {Array} content 
+     */
+    function loadEnvironment(content) {
+        content.forEach(el => {
+            let array = [];
+            el.split(" ").forEach(item => {
+                array.push(parseInt(item));
+            })
+            environment.push(array);
+        });
+
+        for (let i = 0; i < 10; i++) {
+            matrix.push([]);
+            html += "<tr>";
+            for (let j = 0; j < 10; j++) {
+                matrix[i].push(new Cell(i, j, environment[i][j]));
+                if (environment[i][j] > 1) {
+                    html += `<td id="cell${i}-${j}"><img src="img/${environment[i][j]}.webp" width="50px" height="50px"></td>`
+                } else {
+                    html += `<td id="cell${i}-${j}" style="background-color: ${environment[i][j] == 1 ? "black" : "white"};"></td>`
+                }
+            }
+            html += "</tr>";
+        }
+        document.getElementById("matrix").innerHTML = html;
+    }
+
+
+
+
+
+
+
 
     /**
      * Inicio busqueda con amplitud
@@ -41,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
             console.time('Execution Time');
             console.time('road time');
             let road = BFS(environment, startPos);
-            
+
             console.timeEnd('road time');
             console.log(road);
             while (road) {
@@ -52,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             console.timeEnd('Execution Time');
         } else {
-            console.log("Falta el punto de partida o los puntos de llegada");
+            alert("No se encontro el punto de partida");
         }
     }
 
@@ -111,25 +139,21 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (environment[currentNode[0]][currentNode[1]] !== 1) {
                     fathers[`${currentNode[0]},${currentNode[1]}`] = [];
                     if (currentNode[0] > 0 && !visited.has(`${currentNode[0] - 1},${currentNode[1]}`)) {
-                        visited.add(`${currentNode[0] - 1},${currentNode[1]}`)
                         expandedNodes.push([currentNode[0] - 1, currentNode[1]])
                         fathers[`${currentNode[0]},${currentNode[1]}`].push(`${currentNode[0] - 1},${currentNode[1]}`);
                         countExpandedNodes++;
                     }
                     if (currentNode[0] < 9 && !visited.has(`${currentNode[0] + 1},${currentNode[1]}`)) {
-                        visited.add(`${currentNode[0] + 1},${currentNode[1]}`)
                         expandedNodes.push([currentNode[0] + 1, currentNode[1]])
                         fathers[`${currentNode[0]},${currentNode[1]}`].push(`${currentNode[0] + 1},${currentNode[1]}`);
                         countExpandedNodes++;
                     }
                     if (currentNode[1] > 0 && !visited.has(`${currentNode[0]},${currentNode[1] - 1}`)) {
-                        visited.add(`${currentNode[0]},${currentNode[1] - 1}`)
                         expandedNodes.push([currentNode[0], currentNode[1] - 1])
                         fathers[`${currentNode[0]},${currentNode[1]}`].push(`${currentNode[0]},${currentNode[1] - 1}`);
                         countExpandedNodes++;
                     }
                     if (currentNode[1] < 9 && !visited.has(`${currentNode[0]},${currentNode[1] + 1}`)) {
-                        visited.add(`${currentNode[0]},${currentNode[1] + 1}`)
                         expandedNodes.push([currentNode[0], currentNode[1] + 1])
                         fathers[`${currentNode[0]},${currentNode[1]}`].push(`${currentNode[0]},${currentNode[1] + 1}`);
                         countExpandedNodes++;
@@ -182,5 +206,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         return undefined;
     }
+
+    //Eventos
+    document.getElementById('file-input').addEventListener('change', readFile, false);
+    document.getElementById("btn1").addEventListener("click", searchBFS, false);
 
 });
