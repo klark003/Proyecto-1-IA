@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
         [1, 1, 4, 1, 1, 1, 1, 1, 1, 0],
         [1, 1, 0, 4, 4, 0, 0, 1, 1, 5],
         [1, 1, 0, 0, 1, 1, 0, 1, 1, 0],
-        [0, 0, 0, 0, 1, 1, 5, 0, 0, 0],
+        [0, 0, 0, 0, 1, 1, 5, 0, 6, 0],
         [1, 1, 1, 6, 1, 1, 0, 1, 1, 1]],
         matrix = [],
         html = "";
@@ -19,14 +19,42 @@ document.addEventListener("DOMContentLoaded", () => {
         for (let j = 0; j < 10; j++) {
             matrix[i].push(new Cell(i, j, environment[i][j]));
             if (environment[i][j] > 1) {
-                html += `<td><img src="img/${environment[i][j]}.webp" width="50px" height="50px"></td>`
+                html += `<td id="cell${i}-${j}"><img src="img/${environment[i][j]}.webp" width="50px" height="50px"></td>`
             } else {
-                html += `<td style="background-color: ${environment[i][j] == 1 ? "black" : "white"};"></td>`
+                html += `<td id="cell${i}-${j}" style="background-color: ${environment[i][j] == 1 ? "black" : "white"};"></td>`
             }
         }
         html += "</tr>";
     }
     document.getElementById("matrix").innerHTML = html;
+
+    document.getElementById("btn1").addEventListener("click", () => {
+        searchBFS();
+    })
+
+    /**
+     * Inicio busqueda con amplitud
+     */
+    function searchBFS() {
+        const startPos = getStartPoint(environment);
+        if (startPos) {
+            console.time('Execution Time');
+            console.time('road time');
+            let road = BFS(environment, startPos);
+            
+            console.timeEnd('road time');
+            console.log(road);
+            while (road) {
+                console.time('road time');
+                road = BFS(environment, road.currentNode);
+                console.timeEnd('road time');
+                console.log(road);
+            }
+            console.timeEnd('Execution Time');
+        } else {
+            console.log("Falta el punto de partida o los puntos de llegada");
+        }
+    }
 
     /**
      * Retorna la posición del punto inicial
@@ -45,53 +73,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     /**
-     * Retorna las posiciónes de los puntos a donde se debe llegar
-     * @param {matrix} environment 
-     * @returns 
-     */
-    function getEndsPoints(environment) {
-        const endsPos = [];
-        for (let i = 0; i < environment.length; i++) {
-            for (let j = 0; j < environment.length; j++) {
-                if (environment[i][j] == 6) {
-                    endsPos.push([i, j]);
-                }
-            }
-        }
-        return endsPos;
-    }
-
-
-
-    /**
-     * Inicio busqueda con amplitud
-     */
-    function searchBFS() {
-        const startPos = getStartPoint(environment);
-        const endsPos = getEndsPoints(environment);
-        console.log(endsPos);
-        let road = BFS(environment, startPos, endsPos[0]);
-        if (startPos && endsPos.length > 0) {
-            for (let i = 1; i < endsPos.length; i++) {
-                const road1 = BFS(environment, endsPos[-i], endsPos[i]);
-                road.concat(road1);
-            }
-            console.log(road);
-        } else {
-            console.log("Falta el punto de partida o los puntos de llegada");
-        }
-    }
-
-    /**
      * Busqueda con amplitud
      * @param {*} environment 
      * @param {*} startNode 
-     * @param {*} endNode 
      * @returns 
      */
-    function BFS(environment, startNode, endNode) {
+    function BFS(environment, startNode) {
         let tail = [startNode];
         const visited = new Set();
+        let depth = 1;
+        let countExpandedNodes = 1;
         const fathers = {}
 
         while (tail.length > 0) {
@@ -99,41 +90,58 @@ document.addEventListener("DOMContentLoaded", () => {
             for (let i = 0; i < tail.length; i++) {
                 const currentNode = tail[i];
                 visited.add(`${currentNode[0]},${currentNode[1]}`);
-                if (environment[currentNode[0]][currentNode[1]] === environment[endNode[0]][endNode[1]]) {
-                    const road = [endNode];
-                    let father = getFather(endNode, fathers);
+                if (environment[currentNode[0]][currentNode[1]] === 6) {
+                    environment[currentNode[0]][currentNode[1]] = 0;
+                    const road = [currentNode];
+                    let father = getFather(currentNode, fathers);
                     while (father !== undefined) {
                         road.unshift(father);
                         father = getFather(father, fathers);
                     }
-                    return road;
+                    return {
+                        camino: road,
+                        profundidad: depth,
+                        nodosExpandidos: countExpandedNodes,
+                        currentNode: currentNode
+                    };
                 }
+            }
+            for (let i = 0; i < tail.length; i++) {
+                const currentNode = tail[i];
                 if (environment[currentNode[0]][currentNode[1]] !== 1) {
                     fathers[`${currentNode[0]},${currentNode[1]}`] = [];
                     if (currentNode[0] > 0 && !visited.has(`${currentNode[0] - 1},${currentNode[1]}`)) {
                         visited.add(`${currentNode[0] - 1},${currentNode[1]}`)
                         expandedNodes.push([currentNode[0] - 1, currentNode[1]])
                         fathers[`${currentNode[0]},${currentNode[1]}`].push(`${currentNode[0] - 1},${currentNode[1]}`);
+                        countExpandedNodes++;
                     }
                     if (currentNode[0] < 9 && !visited.has(`${currentNode[0] + 1},${currentNode[1]}`)) {
                         visited.add(`${currentNode[0] + 1},${currentNode[1]}`)
                         expandedNodes.push([currentNode[0] + 1, currentNode[1]])
                         fathers[`${currentNode[0]},${currentNode[1]}`].push(`${currentNode[0] + 1},${currentNode[1]}`);
+                        countExpandedNodes++;
                     }
                     if (currentNode[1] > 0 && !visited.has(`${currentNode[0]},${currentNode[1] - 1}`)) {
                         visited.add(`${currentNode[0]},${currentNode[1] - 1}`)
                         expandedNodes.push([currentNode[0], currentNode[1] - 1])
                         fathers[`${currentNode[0]},${currentNode[1]}`].push(`${currentNode[0]},${currentNode[1] - 1}`);
+                        countExpandedNodes++;
                     }
                     if (currentNode[1] < 9 && !visited.has(`${currentNode[0]},${currentNode[1] + 1}`)) {
                         visited.add(`${currentNode[0]},${currentNode[1] + 1}`)
                         expandedNodes.push([currentNode[0], currentNode[1] + 1])
                         fathers[`${currentNode[0]},${currentNode[1]}`].push(`${currentNode[0]},${currentNode[1] + 1}`);
+                        countExpandedNodes++;
                     }
                 }
             }
+            if (expandedNodes.length > 0) {
+                depth++;
+            }
             tail = expandedNodes;
         }
+        return false;
     }
 
     /**
