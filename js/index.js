@@ -22,8 +22,6 @@ document.addEventListener("DOMContentLoaded", () => {
         reader.readAsText(file);
     }
 
-
-
     /**
      * Carga el entorno en la vista
      * @param {Array} content 
@@ -53,32 +51,28 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("matrix").innerHTML = html;
     }
 
-
-
-
-
-
-
-
     /**
      * Inicio busqueda con amplitud
      */
     function searchBFS() {
         const startPos = getStartPoint(environment);
         if (startPos) {
+            const roads = [];
             console.time('Execution Time');
             console.time('road time');
             let road = BFS(environment, startPos);
-
+            roads.push(road.camino);
             console.timeEnd('road time');
             console.log(road);
             while (road) {
                 console.time('road time');
                 road = BFS(environment, road.currentNode);
+                roads.push(road.camino);
                 console.timeEnd('road time');
                 console.log(road);
             }
             console.timeEnd('Execution Time');
+            console.log(roads)
         } else {
             alert("No se encontro el punto de partida");
         }
@@ -112,7 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
         let depth = 1;
         let countExpandedNodes = 1;
         const fathers = {}
-
+        let arrayFathers = [];
         while (tail.length > 0) {
             const expandedNodes = [];
             for (let i = 0; i < tail.length; i++) {
@@ -130,7 +124,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         camino: road,
                         profundidad: depth,
                         nodosExpandidos: countExpandedNodes,
-                        currentNode: currentNode
+                        currentNode: currentNode,
+                        nodos: arrayFathers
                     };
                 }
             }
@@ -138,25 +133,28 @@ document.addEventListener("DOMContentLoaded", () => {
                 const currentNode = tail[i];
                 if (environment[currentNode[0]][currentNode[1]] !== 1) {
                     fathers[`${currentNode[0]},${currentNode[1]}`] = [];
-                    if (currentNode[0] > 0 && !visited.has(`${currentNode[0] - 1},${currentNode[1]}`)) {
+                    if (currentNode[0] > 0 && !visited.has(`${currentNode[0] - 1},${currentNode[1]}`)) {//izquierda
                         expandedNodes.push([currentNode[0] - 1, currentNode[1]])
                         fathers[`${currentNode[0]},${currentNode[1]}`].push(`${currentNode[0] - 1},${currentNode[1]}`);
                         countExpandedNodes++;
                     }
-                    if (currentNode[0] < 9 && !visited.has(`${currentNode[0] + 1},${currentNode[1]}`)) {
+                    if (currentNode[0] < 9 && !visited.has(`${currentNode[0] + 1},${currentNode[1]}`)) {//derecha
                         expandedNodes.push([currentNode[0] + 1, currentNode[1]])
                         fathers[`${currentNode[0]},${currentNode[1]}`].push(`${currentNode[0] + 1},${currentNode[1]}`);
                         countExpandedNodes++;
                     }
-                    if (currentNode[1] > 0 && !visited.has(`${currentNode[0]},${currentNode[1] - 1}`)) {
+                    if (currentNode[1] > 0 && !visited.has(`${currentNode[0]},${currentNode[1] - 1}`)) {//arriba
                         expandedNodes.push([currentNode[0], currentNode[1] - 1])
                         fathers[`${currentNode[0]},${currentNode[1]}`].push(`${currentNode[0]},${currentNode[1] - 1}`);
                         countExpandedNodes++;
                     }
-                    if (currentNode[1] < 9 && !visited.has(`${currentNode[0]},${currentNode[1] + 1}`)) {
+                    if (currentNode[1] < 9 && !visited.has(`${currentNode[0]},${currentNode[1] + 1}`)) {//abajo
                         expandedNodes.push([currentNode[0], currentNode[1] + 1])
                         fathers[`${currentNode[0]},${currentNode[1]}`].push(`${currentNode[0]},${currentNode[1] + 1}`);
                         countExpandedNodes++;
+                    }
+                    if(fathers[`${currentNode[0]},${currentNode[1]}`].length > 0){
+                        arrayFathers.push({father: `${currentNode[0]},${currentNode[1]}`, songs: fathers[`${currentNode[0]},${currentNode[1]}`]})
                     }
                 }
             }
