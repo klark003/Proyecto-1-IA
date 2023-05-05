@@ -57,22 +57,23 @@ document.addEventListener("DOMContentLoaded", () => {
     function searchBFS() {
         const startPos = getStartPoint(environment);
         if (startPos) {
-            const roads = [];
+            const results = [];
             console.time('Execution Time');
             console.time('road time');
-            let road = BFS(environment, startPos);
-            roads.push(road.camino);
+            let result = BFS(environment, startPos);
+            results.push(result.camino);
             console.timeEnd('road time');
-            console.log(road);
-            while (road) {
+            console.log(result);
+            while (result) {
                 console.time('road time');
-                road = BFS(environment, road.currentNode);
-                roads.push(road.camino);
+                result = BFS(environment, result.currentNode);
+                results.push(result.camino);
                 console.timeEnd('road time');
-                console.log(road);
+                console.log(result);
             }
             console.timeEnd('Execution Time');
-            console.log(roads)
+            console.log(results)
+            
         } else {
             alert("No se encontro el punto de partida");
         }
@@ -106,9 +107,9 @@ document.addEventListener("DOMContentLoaded", () => {
         let depth = 1;
         let countExpandedNodes = 1;
         const fathers = {}
-        let arrayFathers = [];
         while (tail.length > 0) {
             const expandedNodes = [];
+            let newTail = [];
             for (let i = 0; i < tail.length; i++) {
                 const currentNode = tail[i];
                 visited.add(`${currentNode[0]},${currentNode[1]}`);
@@ -125,37 +126,34 @@ document.addEventListener("DOMContentLoaded", () => {
                         profundidad: depth,
                         nodosExpandidos: countExpandedNodes,
                         currentNode: currentNode,
-                        nodos: arrayFathers
                     };
+                }else if(environment[currentNode[0]][currentNode[1]] !== 1){
+                    newTail.push(currentNode);
                 }
             }
+            tail = newTail;
             for (let i = 0; i < tail.length; i++) {
                 const currentNode = tail[i];
-                if (environment[currentNode[0]][currentNode[1]] !== 1) {
-                    fathers[`${currentNode[0]},${currentNode[1]}`] = [];
-                    if (currentNode[0] > 0 && !visited.has(`${currentNode[0] - 1},${currentNode[1]}`)) {//izquierda
-                        expandedNodes.push([currentNode[0] - 1, currentNode[1]])
-                        fathers[`${currentNode[0]},${currentNode[1]}`].push(`${currentNode[0] - 1},${currentNode[1]}`);
-                        countExpandedNodes++;
-                    }
-                    if (currentNode[0] < 9 && !visited.has(`${currentNode[0] + 1},${currentNode[1]}`)) {//derecha
-                        expandedNodes.push([currentNode[0] + 1, currentNode[1]])
-                        fathers[`${currentNode[0]},${currentNode[1]}`].push(`${currentNode[0] + 1},${currentNode[1]}`);
-                        countExpandedNodes++;
-                    }
-                    if (currentNode[1] > 0 && !visited.has(`${currentNode[0]},${currentNode[1] - 1}`)) {//arriba
-                        expandedNodes.push([currentNode[0], currentNode[1] - 1])
-                        fathers[`${currentNode[0]},${currentNode[1]}`].push(`${currentNode[0]},${currentNode[1] - 1}`);
-                        countExpandedNodes++;
-                    }
-                    if (currentNode[1] < 9 && !visited.has(`${currentNode[0]},${currentNode[1] + 1}`)) {//abajo
-                        expandedNodes.push([currentNode[0], currentNode[1] + 1])
-                        fathers[`${currentNode[0]},${currentNode[1]}`].push(`${currentNode[0]},${currentNode[1] + 1}`);
-                        countExpandedNodes++;
-                    }
-                    if(fathers[`${currentNode[0]},${currentNode[1]}`].length > 0){
-                        arrayFathers.push({father: `${currentNode[0]},${currentNode[1]}`, songs: fathers[`${currentNode[0]},${currentNode[1]}`]})
-                    }
+                fathers[`${currentNode[0]},${currentNode[1]}`] = [];
+                if (currentNode[0] > 0 && !visited.has(`${currentNode[0] - 1},${currentNode[1]}`)) {//izquierda
+                    expandedNodes.push([currentNode[0] - 1, currentNode[1]])
+                    fathers[`${currentNode[0]},${currentNode[1]}`].push(`${currentNode[0] - 1},${currentNode[1]}`);
+                    countExpandedNodes++;
+                }
+                if (currentNode[0] < 9 && !visited.has(`${currentNode[0] + 1},${currentNode[1]}`)) {//derecha
+                    expandedNodes.push([currentNode[0] + 1, currentNode[1]])
+                    fathers[`${currentNode[0]},${currentNode[1]}`].push(`${currentNode[0] + 1},${currentNode[1]}`);
+                    countExpandedNodes++;
+                }
+                if (currentNode[1] > 0 && !visited.has(`${currentNode[0]},${currentNode[1] - 1}`)) {//arriba
+                    expandedNodes.push([currentNode[0], currentNode[1] - 1])
+                    fathers[`${currentNode[0]},${currentNode[1]}`].push(`${currentNode[0]},${currentNode[1] - 1}`);
+                    countExpandedNodes++;
+                }
+                if (currentNode[1] < 9 && !visited.has(`${currentNode[0]},${currentNode[1] + 1}`)) {//abajo
+                    expandedNodes.push([currentNode[0], currentNode[1] + 1])
+                    fathers[`${currentNode[0]},${currentNode[1]}`].push(`${currentNode[0]},${currentNode[1] + 1}`);
+                    countExpandedNodes++;
                 }
             }
             if (expandedNodes.length > 0) {
