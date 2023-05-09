@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
             for (let j = 0; j < 10; j++) {
                 matrix[i].push(new Cell(i, j, environment[i][j]));
                 if (environment[i][j] > 1) {
-                    html += `<td id="cell${i}-${j}"><img src="img/${environment[i][j]}.webp" width="50px" height="50px"></td>`
+                    html += `<td id="cell${i}-${j}"><img src="assets/img/${environment[i][j]}.webp" width="50px" height="50px"></td>`
                 } else {
                     html += `<td id="cell${i}-${j}" style="background-color: ${environment[i][j] == 1 ? "black" : "white"};"></td>`
                 }

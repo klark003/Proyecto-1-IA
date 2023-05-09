@@ -1,26 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GoKu AI</title>
     <script src="js/cell.js"></script>
     <script src="js/index.js"></script>
     <style>
-        td {
-            width: 50px;
-            height: 50px;
+      td {
+        width: 50px;
+        height: 50px;
+      }
+      .container6 {
+        width: 1060px;
+        height: 840px;
+        border: 1px solid black;
+        margin: 0 auto;
+        text-align: center;
+        background: #ff5733;
+      }
+      .container7 {
+        display: flex;
+        justify-content: center;
+        align-items: center;
 
-        }
+        margin: 10%;
+      }
+      .container8 {
+        margin: 0 auto;
+        text-align: center;
+        background: #fff;
+      }
+      
     </style>
-</head>
+  </head>
 
-<body>
-    <button id="btn1">Buscar</button>
-    <input type="file" id="file-input" />
-    <table id="matrix" border="1"></table>
-</body>
+  <body>
+    <div class="container6">
 
+        <button id="btn1">Buscar</button>
+   
+      <label for="tipoAlgoritmo-select">Selecciona el algoritmo:</label>
+      <select id="tipoAlgoritmo-select">
+        <option value="Amplitud">Amplitud</option>
+        <option value="Costos">Costos</option>
+        <option value="Profundiad">Profundidad</option>
+        <option value="Avaro">Avaro</option>
+        <option value="A*">A*</option>
+      </select>
+
+      <input type="file" id="file-input" />
+
+      <div class="container7">
+        <div class="container8">
+          <table id="matrix" border="1"></table>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>
