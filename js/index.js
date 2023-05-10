@@ -193,6 +193,78 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         return false;
     }
+    
+    /**
+     * Busqueda con profundidad
+     **/
+
+    function DFS(environment, startNode) {
+        let path = [];
+        const visited = new Set();
+        const stack = [[startNode, 0]];
+        const fathers = {};
+        let maxDepth = 0;
+        let goalsFound = 0;
+        let goals = [];
+        let result = {}; // Objeto devuelto por la función
+      
+        while (stack.length > 0) {
+          const [currentNode, depth] = stack.pop();
+          if (depth > maxDepth) {
+            maxDepth = depth;
+          }
+          if (!visited.has(`${currentNode[0]},${currentNode[1]}`)) {
+            visited.add(`${currentNode[0]},${currentNode[1]}`);
+            path.push(currentNode);
+            if (environment[currentNode[0]][currentNode[1]] === 6) {
+              environment[currentNode[0]][currentNode[1]] = 0;
+              goalsFound++;
+              goals.push(currentNode);
+              if (goalsFound === 2) {
+                const road = [currentNode];
+                let father = getFather(currentNode, fathers);
+                while (father !== undefined) {
+                  road.unshift(father);
+                  father = getFather(father, fathers);
+                }
+                result = {
+                  camino: road,
+                  nodosExpandidos: visited.size,
+                  nodos: fathers,
+                  depth: depth,
+                  maxDepth: maxDepth,
+                  goals: goals
+                };
+                break; // Salir del ciclo while si se encontraron ambos nodos meta
+              }
+            }
+            if (environment[currentNode[0]][currentNode[1]] !== 1) {
+              fathers[`${currentNode[0]},${currentNode[1]}`] = [];
+              if (currentNode[0] > 0 && environment[currentNode[0] - 1][currentNode[1]] !== 1) {
+                stack.push([[currentNode[0] - 1, currentNode[1]], depth + 1]);
+                fathers[`${currentNode[0]},${currentNode[1]}`].push(`${currentNode[0] - 1},${currentNode[1]}`);
+              }
+              if (currentNode[0] < 9 && environment[currentNode[0] + 1][currentNode[1]] !== 1) {
+                stack.push([[currentNode[0] + 1, currentNode[1]], depth + 1]);
+                fathers[`${currentNode[0]},${currentNode[1]}`].push(`${currentNode[0] + 1},${currentNode[1]}`);
+              }
+              if (currentNode[1] > 0 && environment[currentNode[0]][currentNode[1] - 1] !== 1) {
+                stack.push([[currentNode[0], currentNode[1] - 1], depth + 1]);
+                fathers[`${currentNode[0]},${currentNode[1]}`].push(`${currentNode[0]},${currentNode[1] - 1}`);
+              }
+              if (currentNode[1] < 9 && environment[currentNode[0]][currentNode[1] + 1] !== 1) {
+                stack.push([[currentNode[0], currentNode[1] + 1], depth + 1]);
+                fathers[`${currentNode[0]},${currentNode[1]}`].push(`${currentNode[0]},${currentNode[1] + 1}`);
+              }
+            }
+          }
+        }
+     
+      }
+    
+    
+    
+    
 
     /**
      * Obtiene el padre
