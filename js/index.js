@@ -78,6 +78,36 @@ document.addEventListener("DOMContentLoaded", () => {
             alert("No se encontro el punto de partida");
         }
     }
+    
+    /**
+     * Inicio busqueda por profundidad
+     */
+    
+    function searchDFS() {
+        const startPos = getStartPoint(environment);
+        if (startPos) {
+          const roads = [];
+          console.time('Execution Time');
+          console.time('road time');
+      
+          // Buscar el primer nodo meta
+          let road1 = DFS(environment, startPos);
+          roads.push(road1.camino);
+      
+          // Buscar el segundo nodo meta
+          let road2 = DFS(environment, startPos);
+          roads.push(road2.camino);
+      
+          console.timeEnd('road time');
+          console.log(road1);
+          console.log(road2);
+      
+          console.timeEnd('Execution Time');
+          console.log(roads)
+        } else {
+          alert("No se encontro el punto de partida");
+        }
+      }
 
     /**
      * Retorna la posición del punto inicial
