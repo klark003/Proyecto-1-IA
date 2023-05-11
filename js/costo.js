@@ -5,13 +5,11 @@ function uniformCostSearch(matrix, start) {
     const rows = matrix.length;
     const cols = matrix[0].length;
 
-
-
     // Creamos una cola de prioridad para guardar los nodos a explorar
     let priorityQueue = new PriorityQueue();
 
     // Agregamos el nodo inicial con un costo de 0 a la cola de prioridad
-    priorityQueue.enqueue([start, 0, 0, []]);
+    priorityQueue.enqueue([start, 0, 0, [],[]]);
 
     // Creamos una matriz para guardar los costos acumulados
     let costMatrix = Array.from({ length: rows }, () =>
@@ -26,7 +24,7 @@ function uniformCostSearch(matrix, start) {
     // Mientras haya nodos por explorar en la cola de prioridad
     while (!priorityQueue.isEmpty()) {
         // Sacamos el nodo con el menor costo de la cola de prioridad
-        const [currentNode, currentCost, currentSeeds, currentPositionsRecolectedSeeds] = priorityQueue.dequeue();
+        let [currentNode, currentCost, currentSeeds, currentPositionsRecolectedSeeds,currentPositionsDeletedEnemies] = priorityQueue.dequeue();
 
         // Si el nodo actual ya fue explorado con un costo menor, lo ignoramos
         if (currentCost > costMatrix[currentNode[0]][currentNode[1]]) {
@@ -49,7 +47,7 @@ function uniformCostSearch(matrix, start) {
                     const node = nodes[i].node;
                     if (node[0][0] == currentNode[0] && node[0][1] == currentNode[1]) {
                         current = nodes[i];
-                        roat.push(current.node[0]);
+                        roat.push(current.node);
                         break;
                     }
                 }
@@ -58,10 +56,10 @@ function uniformCostSearch(matrix, start) {
                     const node = current.father.node;
                     if (father[1] == node[1] && father[0][0] == node[0][0] && father[0][1] == node[0][1]) {
                         current = nodes[i];
-                        roat.unshift(current.node[0]);
+                        roat.unshift(current.node);
                     }
                 }
-                roat.unshift(current.father.node[0])
+                roat.unshift(current.father.node)
                 return {
                     roat: roat,
                     depth: roat.length - 1,
@@ -69,6 +67,16 @@ function uniformCostSearch(matrix, start) {
                     cost: currentCost
                 };
             } else {
+                currentPositionsRecolectedSeeds.forEach(posSeed => {
+                    console.log(posSeed)
+                    matrix[posSeed[0]][posSeed[1]] = 0;
+                })
+                currentPositionsDeletedEnemies.forEach(posEnemy => {
+                    console.log(posEnemy)
+                    matrix[posEnemy[0]][posEnemy[1]] = 0;
+                })
+                currentPositionsRecolectedSeeds = [];
+                currentPositionsDeletedEnemies = [];
                 priorityQueue = new PriorityQueue();
                 costMatrix = Array.from({ length: rows }, () =>
                     Array.from({ length: cols }, () => Infinity)
@@ -81,30 +89,37 @@ function uniformCostSearch(matrix, start) {
         // Actualizamos los costos de los vecinos del nodo actual
         for (const [i, j] of getNeighbors(currentNode, rows, cols)) {
             let neighborPositionsRecolectedSeeds = [];
+            let neighborPositionsDeletedEnemies = [];
             let totalSeeds = 0;
             let neighborCost = 1;
             if (matrix[i][j] == 3) {// si hay un freezer
                 if (currentSeeds > 0) {// si tengo semilla
+                    neighborPositionsDeletedEnemies.push([i, j]);
                     totalSeeds = currentSeeds - 1;
                 } else {// si no tengo
                     neighborCost = 4;
                 }
             } else if (matrix[i][j] == 4) {// si hay un cell
                 if (currentSeeds > 0) {// si tengo semilla
+                    neighborPositionsDeletedEnemies.push([i, j]);
                     totalSeeds = currentSeeds - 1;
                 } else {// si no tengo
                     neighborCost = 7;
                 }
-            } else if (matrix[i][j] == 5 && isNotRecolectedSeed(i, j, currentPositionsRecolectedSeeds)) {
+            } else if (matrix[i][j] == 5) {
                 neighborPositionsRecolectedSeeds.push([i, j]);
                 totalSeeds = currentSeeds + 1;
+            }else{
+                totalSeeds = currentSeeds;
             }
 
             const totalCost = currentCost + neighborCost;
             const totalPositionsRecolectedSeeds = currentPositionsRecolectedSeeds.concat(neighborPositionsRecolectedSeeds);
+            const totalPositionsDeletedEnemies = currentPositionsDeletedEnemies.concat(neighborPositionsDeletedEnemies);
+
             if (totalCost < costMatrix[i][j]) {
                 costMatrix[i][j] = totalCost;
-                priorityQueue.enqueue([[i, j], totalCost, totalSeeds, totalPositionsRecolectedSeeds]);
+                priorityQueue.enqueue([[i, j], totalCost, totalSeeds, totalPositionsRecolectedSeeds,totalPositionsDeletedEnemies]);
                 const node = new Node([[i, j], totalCost]);
                 node.insertFather(new Node([currentNode, currentCost]));
                 nodes.push(node);
@@ -116,79 +131,12 @@ function uniformCostSearch(matrix, start) {
     return null;
 }
 
-/**
- * Verifica si ya recolecto una semilla para una casilla
- * @param {*} i 
- * @param {*} j 
- * @param {*} currentPositionsRecolectedSeeds 
- */
-function isNotRecolectedSeed(i, j, positionsRecolectedSeeds) {
-    for (let index = 0; index < positionsRecolectedSeeds.length; index++) {
-        const pos = positionsRecolectedSeeds[index];
-        if (pos[0] == i && pos[1] == j) {
-            return false;
-        }
-    }
-    return true;
-}
-
-// Función para obtener los vecinos de una celda en la matriz
-function getNeighbors(node, rows, cols) {
-    const [i, j] = node;
-    const neighbors = [];
-    if (i > 0) {
-        neighbors.push([i - 1, j]);
-    }
-    if (i < rows - 1) {
-        neighbors.push([i + 1, j]);
-    }
-    if (j > 0) {
-        neighbors.push([i, j - 1]);
-    }
-    if (j < cols - 1) {
-        neighbors.push([i, j + 1]);
-    }
-    return neighbors;
-}
-
-// Clase para implementar una cola de prioridad
-class PriorityQueue {
-    constructor() {
-        this.items = [];
-    }
-
-    isEmpty() {
-        return this.items.length === 0;
-    }
-
-    enqueue(item) {
-        let added = false;
-        for (let i = 0; i < this.items.length; i++) {
-            if (item[1] < this.items[i][1]) {
-                this.items.splice(i, 0, item);
-                added = true;
-                break;
-            }
-        }
-        if (!added) {
-            this.items.push(item);
-        }
-    }
-
-    dequeue() {
-        if (this.isEmpty()) {
-            return null;
-        }
-        return this.items.shift();
-    }
-}
-
 let matrix = [
     [0, 5, 3, 1, 1, 1, 1, 1, 1, 1],
     [0, 1, 0, 0, 1, 0, 0, 0, 1, 1],
     [0, 1, 1, 0, 3, 5, 1, 0, 2, 0],
     [0, 1, 1, 1, 3, 1, 1, 1, 1, 0],
-    [6, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [6, 5, 0, 0, 0, 0, 0, 0, 0, 0],
     [1, 1, 4, 1, 1, 1, 1, 1, 1, 0],
     [1, 1, 0, 4, 4, 0, 0, 1, 1, 5],
     [1, 1, 0, 0, 1, 1, 0, 1, 1, 0],
@@ -198,6 +146,7 @@ let matrix = [
 const start = [2, 8];
 const cost = uniformCostSearch(matrix, start);
 console.log(cost); // Output: 15
+console.log(matrix)
 
 
 

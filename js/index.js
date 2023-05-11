@@ -119,7 +119,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (environment[currentNode[0]][currentNode[1]] === 6) {
                     countGoals++;
                     environment[currentNode[0]][currentNode[1]] = 0;
-                    console.log(countGoals, totalCountGoals);
                     if (countGoals == totalCountGoals) {
                         let current = undefined;
                         const roat = []
@@ -144,7 +143,6 @@ document.addEventListener("DOMContentLoaded", () => {
                             camino: roat,
                             profundidad: depth,
                             nodosExpandidos: countExpandedNodes,
-                            currentNode: currentNode,
                             fathers: nodes
                         };
                     } else {
@@ -274,7 +272,6 @@ document.addEventListener("DOMContentLoaded", () => {
      * @param {*} array 
      */
     function showSolution(array,index){
-        console.log(index)
         if(index < array.length){
             const currentCell = document.getElementById(`cell${array[index][0]}-${array[index][1]}`);
             currentCell.innerHTML = `<img src="assets/img/2.webp" width="50px" height="50px">`;
