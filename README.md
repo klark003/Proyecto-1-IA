@@ -3,6 +3,7 @@
 Universidad del Valle
 
 Facultad de Ingeniería | Escuela de Ingeniería de Sistemas y Computación | Inteligencia Artificial
+Carlos Alberto Henao - 2110339 | Oscar Trujillo - 2110318 | Sebastián Tutistar Valencia - 2110309
 
 # Algoritmos de búsqueda
 
