@@ -1,18 +1,3 @@
-// Función heurística para estimar el costo restante desde un nodo hasta el objetivo
-function heuristic(node, goals) {
-    let lowerEstimatedCost = Infinity;
-    for (let i = 0; i < goals.length; i++) {
-        const goal = goals[i];
-        const dx = Math.abs(node[0] - goal[0]);
-        const dy = Math.abs(node[1] - goal[1]);
-        const estimatedCost = dx + dy;
-        if (estimatedCost < lowerEstimatedCost) {
-            lowerEstimatedCost = estimatedCost;
-        }
-    }
-    return lowerEstimatedCost;
-}
-
 // Algoritmo A* adaptado para búsqueda informada
 function aStarSearch(matrix, start) {
     const nodes = [];

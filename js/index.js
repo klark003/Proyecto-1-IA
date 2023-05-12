@@ -61,41 +61,41 @@ document.addEventListener("DOMContentLoaded", () => {
             const result = BFS(environment, startPos);
             console.timeEnd('road time');
             console.log(result)
-            showSolution(result.camino,0);
+            showSolution(result.camino, 0);
         } else {
             alert("No se encontro el punto de partida");
         }
     }
-    
+
     /**
      * Inicio busqueda por profundidad
      */
-    
+
     function searchDFS() {
         const startPos = getStartPoint(environment);
         if (startPos) {
-          const roads = [];
-          console.time('Execution Time');
-          console.time('road time');
-      
-          // Buscar el primer nodo meta
-          let road1 = DFS(environment, startPos);
-          roads.push(road1.camino);
-      
-          // Buscar el segundo nodo meta
-          let road2 = DFS(environment, startPos);
-          roads.push(road2.camino);
-      
-          console.timeEnd('road time');
-          console.log(road1);
-          console.log(road2);
-      
-          console.timeEnd('Execution Time');
-          console.log(roads)
+            const roads = [];
+            console.time('Execution Time');
+            console.time('road time');
+
+            // Buscar el primer nodo meta
+            let road1 = DFS(environment, startPos);
+            roads.push(road1.camino);
+
+            // Buscar el segundo nodo meta
+            let road2 = DFS(environment, startPos);
+            roads.push(road2.camino);
+
+            console.timeEnd('road time');
+            console.log(road1);
+            console.log(road2);
+
+            console.timeEnd('Execution Time');
+            console.log(roads)
         } else {
-          alert("No se encontro el punto de partida");
+            alert("No se encontro el punto de partida");
         }
-      }
+    }
 
     /**
      * Busqueda con amplitud
@@ -194,7 +194,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         return false;
     }
-    
+
     /**
      * Busqueda con profundidad
      **/
@@ -208,79 +208,79 @@ document.addEventListener("DOMContentLoaded", () => {
         let goalsFound = 0;
         let goals = [];
         let result = {}; // Objeto devuelto por la función
-      
+
         while (stack.length > 0) {
-          const [currentNode, depth] = stack.pop();
-          if (depth > maxDepth) {
-            maxDepth = depth;
-          }
-          if (!visited.has(`${currentNode[0]},${currentNode[1]}`)) {
-            visited.add(`${currentNode[0]},${currentNode[1]}`);
-            path.push(currentNode);
-            if (environment[currentNode[0]][currentNode[1]] === 6) {
-              environment[currentNode[0]][currentNode[1]] = 0;
-              goalsFound++;
-              goals.push(currentNode);
-              if (goalsFound === 2) {
-                const road = [currentNode];
-                let father = getFather(currentNode, fathers);
-                while (father !== undefined) {
-                  road.unshift(father);
-                  father = getFather(father, fathers);
+            const [currentNode, depth] = stack.pop();
+            if (depth > maxDepth) {
+                maxDepth = depth;
+            }
+            if (!visited.has(`${currentNode[0]},${currentNode[1]}`)) {
+                visited.add(`${currentNode[0]},${currentNode[1]}`);
+                path.push(currentNode);
+                if (environment[currentNode[0]][currentNode[1]] === 6) {
+                    environment[currentNode[0]][currentNode[1]] = 0;
+                    goalsFound++;
+                    goals.push(currentNode);
+                    if (goalsFound === 2) {
+                        const road = [currentNode];
+                        let father = getFather(currentNode, fathers);
+                        while (father !== undefined) {
+                            road.unshift(father);
+                            father = getFather(father, fathers);
+                        }
+                        result = {
+                            camino: road,
+                            nodosExpandidos: visited.size,
+                            nodos: fathers,
+                            depth: depth,
+                            maxDepth: maxDepth,
+                            goals: goals
+                        };
+                        break; // Salir del ciclo while si se encontraron ambos nodos meta
+                    }
                 }
-                result = {
-                  camino: road,
-                  nodosExpandidos: visited.size,
-                  nodos: fathers,
-                  depth: depth,
-                  maxDepth: maxDepth,
-                  goals: goals
-                };
-                break; // Salir del ciclo while si se encontraron ambos nodos meta
-              }
+                if (environment[currentNode[0]][currentNode[1]] !== 1) {
+                    fathers[`${currentNode[0]},${currentNode[1]}`] = [];
+                    if (currentNode[0] > 0 && environment[currentNode[0] - 1][currentNode[1]] !== 1) {
+                        stack.push([[currentNode[0] - 1, currentNode[1]], depth + 1]);
+                        fathers[`${currentNode[0]},${currentNode[1]}`].push(`${currentNode[0] - 1},${currentNode[1]}`);
+                    }
+                    if (currentNode[0] < 9 && environment[currentNode[0] + 1][currentNode[1]] !== 1) {
+                        stack.push([[currentNode[0] + 1, currentNode[1]], depth + 1]);
+                        fathers[`${currentNode[0]},${currentNode[1]}`].push(`${currentNode[0] + 1},${currentNode[1]}`);
+                    }
+                    if (currentNode[1] > 0 && environment[currentNode[0]][currentNode[1] - 1] !== 1) {
+                        stack.push([[currentNode[0], currentNode[1] - 1], depth + 1]);
+                        fathers[`${currentNode[0]},${currentNode[1]}`].push(`${currentNode[0]},${currentNode[1] - 1}`);
+                    }
+                    if (currentNode[1] < 9 && environment[currentNode[0]][currentNode[1] + 1] !== 1) {
+                        stack.push([[currentNode[0], currentNode[1] + 1], depth + 1]);
+                        fathers[`${currentNode[0]},${currentNode[1]}`].push(`${currentNode[0]},${currentNode[1] + 1}`);
+                    }
+                }
             }
-            if (environment[currentNode[0]][currentNode[1]] !== 1) {
-              fathers[`${currentNode[0]},${currentNode[1]}`] = [];
-              if (currentNode[0] > 0 && environment[currentNode[0] - 1][currentNode[1]] !== 1) {
-                stack.push([[currentNode[0] - 1, currentNode[1]], depth + 1]);
-                fathers[`${currentNode[0]},${currentNode[1]}`].push(`${currentNode[0] - 1},${currentNode[1]}`);
-              }
-              if (currentNode[0] < 9 && environment[currentNode[0] + 1][currentNode[1]] !== 1) {
-                stack.push([[currentNode[0] + 1, currentNode[1]], depth + 1]);
-                fathers[`${currentNode[0]},${currentNode[1]}`].push(`${currentNode[0] + 1},${currentNode[1]}`);
-              }
-              if (currentNode[1] > 0 && environment[currentNode[0]][currentNode[1] - 1] !== 1) {
-                stack.push([[currentNode[0], currentNode[1] - 1], depth + 1]);
-                fathers[`${currentNode[0]},${currentNode[1]}`].push(`${currentNode[0]},${currentNode[1] - 1}`);
-              }
-              if (currentNode[1] < 9 && environment[currentNode[0]][currentNode[1] + 1] !== 1) {
-                stack.push([[currentNode[0], currentNode[1] + 1], depth + 1]);
-                fathers[`${currentNode[0]},${currentNode[1]}`].push(`${currentNode[0]},${currentNode[1] + 1}`);
-              }
-            }
-          }
         }
-     
-      }
-    
-    
-    
-    
+
+    }
+
+
+
+
 
     /**
      * Muestra la solución encontrada
      * @param {*} array 
      */
-    function showSolution(array,index){
-        if(index < array.length){
+    function showSolution(array, index) {
+        if (index < array.length) {
             const currentCell = document.getElementById(`cell${array[index][0]}-${array[index][1]}`);
             currentCell.innerHTML = `<img src="assets/img/2.webp" width="50px" height="50px">`;
-            if(index > 0){
+            if (index > 0) {
                 const previousCell = document.getElementById(`cell${array[index - 1][0]}-${array[index - 1][1]}`);
                 previousCell.innerHTML = "";
             }
             setTimeout(() => {
-                showSolution(array,index + 1)
+                showSolution(array, index + 1)
             }, 200);
         }
     }
