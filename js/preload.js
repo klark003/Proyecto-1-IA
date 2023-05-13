@@ -108,3 +108,21 @@ function getNeighbors(node, rows, cols) {
     }
     return neighbors;
 }
+
+/**
+     * Muestra la solución encontrada
+     * @param {*} array 
+     */
+async function showSolution(array, index) {
+    if (index < array.length) {
+        const currentCell = document.getElementById(`cell${array[index][0]}-${array[index][1]}`);
+        currentCell.innerHTML = `<img src="assets/img/2.webp" width="50px" height="50px">`;
+        if (index > 0) {
+            const previousCell = document.getElementById(`cell${array[index - 1][0]}-${array[index - 1][1]}`);
+            previousCell.innerHTML = "";
+        }
+        setTimeout(() => {
+            showSolution(array, index + 1)
+        }, 200);
+    }
+}

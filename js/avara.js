@@ -1,7 +1,26 @@
+function searchAvara() {
+    const startPos = getStartPoint(environment);
+    if (startPos) {
+        console.log("Busqueda por Avara");
+        let t1 = performance.now();
+        const result = avara(environment, startPos);
+        let t2 = performance.now();
+        let txtSolution = `Road time: ${t2 - t1} ms\n`;
+        console.log(result.camino);
+        for (const key in result) {
+            if(key != "camino"){
+                txtSolution += `${key}: ${result[key]}\n`;
+            }
+        }
+        document.getElementById("solution").innerText = txtSolution;
+        showSolution(result.camino, 0);
+    } else {
+        alert("No se encontro el punto de partida");
+    }
+}
 
 
-// Algoritmo A* adaptado para búsqueda informada
-function aStarSearch(matrix, start) {
+function avara(matrix, start) {
     const nodes = [];
     const rows = matrix.length;
     const cols = matrix[0].length;
@@ -47,10 +66,9 @@ function aStarSearch(matrix, start) {
                 }
                 roat.unshift(current.father.node[0])
                 return {
-                    roat: roat,
-                    depth: roat.length - 1,
-                    nodes: nodes,
-                    cost: currentEstimatedCost
+                    camino: roat,
+                    profundidad: roat.length - 1,
+                    totalNodosExpandidos: nodes.length,
                 };
             }
 
@@ -78,24 +96,3 @@ function aStarSearch(matrix, start) {
 
     return null;
 }
-
-
-
-
-let matrix = [
-    [0, 5, 3, 1, 1, 1, 1, 1, 1, 1],
-    [0, 1, 0, 0, 1, 0, 0, 0, 1, 1],
-    [0, 1, 1, 0, 3, 5, 1, 0, 2, 0],
-    [0, 1, 1, 1, 3, 1, 1, 1, 1, 0],
-    [6, 5, 0, 0, 0, 0, 0, 0, 0, 0],
-    [1, 1, 4, 1, 1, 1, 1, 1, 1, 0],
-    [1, 1, 0, 4, 4, 0, 0, 1, 1, 5],
-    [1, 1, 0, 0, 1, 1, 0, 1, 1, 0],
-    [0, 0, 0, 0, 1, 1, 5, 0, 0, 0],
-    [1, 1, 1, 6, 1, 1, 0, 1, 1, 1]
-]
-
-const start = [2, 8];
-
-const path = aStarSearch(matrix, start);
-console.log(path)

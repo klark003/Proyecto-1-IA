@@ -1,64 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GoKu AI</title>
-    <script src="js/cell.js"></script>
-    <script src="js/index.js"></script>
-    <script src="js/preload.js"></script>
-    <script src="js/dfs.js"></script>
-    <style>
-      td {
-        width: 50px;
-        height: 50px;
-      }
-      .container6 {
-        width: 1060px;
-        height: 840px;
-        border: 1px solid black;
-        margin: 0 auto;
-        text-align: center;
-        background: #ff5733;
-      }
-      .container7 {
-        display: flex;
-        justify-content: center;
-        align-items: center;
 
-        margin: 10%;
-      }
-      .container8 {
-        margin: 0 auto;
-        text-align: center;
-        background: #fff;
-      }
-      
-    </style>
-  </head>
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GoKu AI</title>
+  
+  
+  <style>
+    td {
+      width: 50px;
+      height: 50px;
+    }
 
-  <body>
-    <div class="container6">
+    .container6 {
+      width: 1060px;
+      height: 840px;
+      border: 1px solid black;
+      margin: 0 auto;
+      text-align: center;
+      background: #ff5733;
+    }
 
-        <button id="btn1">Buscar</button>
-   
-      <label for="tipoAlgoritmo-select">Selecciona el algoritmo:</label>
-      <select id="tipoAlgoritmo-select">
-        <option value="Amplitud">Amplitud</option>
-        <option value="Costos">Costos</option>
-        <option value="Profundiad">Profundidad</option>
-        <option value="Avaro">Avaro</option>
-        <option value="A*">A*</option>
-      </select>
+    .container7 {
+      display: flex;
+      justify-content: center;
+      align-items: center;
 
-      <input type="file" id="file-input" />
+      margin: 10%;
+    }
 
-      <div class="container7">
-        <div class="container8">
-          <table id="matrix" border="1"></table>
-        </div>
+    .container8 {
+      margin: 0 auto;
+      text-align: center;
+      background: #fff;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container6">
+
+    
+
+    <label for="tipos-busqueda">Seleccionar tipo de busqueda:</label>
+    <select id="tipos-busqueda">
+      <option value="1">Informada</option>
+      <option value="2">No informada</option>
+    </select>
+
+    <label for="tipoAlgoritmo-select">Selecciona el algoritmo:</label>
+    <select id="tipoAlgoritmo-select">
+      <option value="Avaro">Avaro</option>
+      <option value="A*">A*</option>
+    </select>
+
+    <input type="file" id="file-input" />
+
+    <button id="btn1">Buscar</button>
+
+    
+
+    <div class="container7">
+      <div class="container8">
+        <table id="matrix" border="1"></table>
       </div>
+      <p id="solution"></p>
     </div>
-  </body>
+  </div>
+
+</body>
+<script>
+  document.getElementById("tipos-busqueda").addEventListener('change', selectSearch, false);
+  function selectSearch() {
+    const typeSearch = document.getElementById("tipos-busqueda");
+    const tipoAlgoritmo = document.getElementById("tipoAlgoritmo-select");
+    if (typeSearch.value == "1") {
+      tipoAlgoritmo.innerHTML = `
+        <option value="Avaro">Avaro</option>
+        <option value="A*">A*</option>`;
+
+    } else {
+      tipoAlgoritmo.innerHTML = `
+      <option value="Amplitud">Amplitud</option>
+      <option value="Costos">Costos</option>
+      <option value="Profundiad">Profundidad</option>`;
+    }
+  }
+
+
+</script>
+<script src="js/index.js"></script>
+  <script src="js/dfs.js"></script>
+  <script src="js/preload.js"></script>
+  <script src="js/amplitud.js"></script>
+  <script src="js/aStart.js"></script>
+  <script src="js/avara.js"></script>
+  <script src="js/costo.js"></script>
+
 </html>

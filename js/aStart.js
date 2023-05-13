@@ -1,5 +1,26 @@
-// Algoritmo A* adaptado para búsqueda informada
-function aStarSearch(matrix, start) {
+
+function searchAStart() {
+    const startPos = getStartPoint(environment);
+    if (startPos) {
+        console.log("Busqueda por A*");
+        let t1 = performance.now();
+        const result = aStart(environment, startPos);
+        let t2 = performance.now();
+        let txtSolution = `Road time: ${t2 - t1} ms\n`;
+        console.log(result.camino);
+        for (const key in result) {
+            if(key != "camino"){
+                txtSolution += `${key}: ${result[key]}\n`;
+            }
+        }
+        document.getElementById("solution").innerText = txtSolution;
+        showSolution(result.camino, 0);
+    } else {
+        alert("No se encontro el punto de partida");
+    }
+}
+
+function aStart(matrix, start) {
     const nodes = [];
     const rows = matrix.length;
     const cols = matrix[0].length;
@@ -22,7 +43,6 @@ function aStarSearch(matrix, start) {
         if (matrix[currentNode[0]][currentNode[1]] == 1) {
             continue;
         }
-        console.log(currentNode)
         if (matrix[currentNode[0]][currentNode[1]] == 6) {
 
             matrix[currentNode[0]][currentNode[1]] = 0;
@@ -40,7 +60,7 @@ function aStarSearch(matrix, start) {
                     const node = nodes[i].node;
                     if (node[0][0] == currentNode[0] && node[0][1] == currentNode[1]) {
                         current = nodes[i];
-                        roat.push(current.node);
+                        roat.push(current.node[0]);
                         break;
                     }
                 }
@@ -49,23 +69,21 @@ function aStarSearch(matrix, start) {
                     const node = current.father.node;
                     if (father[1] == node[1] && father[0][0] == node[0][0] && father[0][1] == node[0][1]) {
                         current = nodes[i];
-                        roat.unshift(current.node);
+                        roat.unshift(current.node[0]);
                     }
                 }
-                roat.unshift(current.father.node)
+                roat.unshift(current.father.node[0])
                 return {
-                    roat: roat,
-                    depth: roat.length - 1,
-                    nodes: nodes,
-                    cost: currentCost
+                    camino: roat,
+                    profundidad: roat.length - 1,
+                    totalNodosExpandidos: nodes.length,
+                    costo: currentCost
                 };
             } else {
                 currentPositionsRecolectedSeeds.forEach(posSeed => {
-                    console.log(posSeed)
                     matrix[posSeed[0]][posSeed[1]] = 0;
                 })
                 currentPositionsDeletedEnemies.forEach(posEnemy => {
-                    console.log(posEnemy)
                     matrix[posEnemy[0]][posEnemy[1]] = 0;
                 })
                 currentPositionsRecolectedSeeds = [];
@@ -121,24 +139,3 @@ function aStarSearch(matrix, start) {
 
     return null;
 }
-
-
-
-
-let matrix = [
-    [0, 5, 3, 1, 1, 1, 1, 1, 1, 1],
-    [0, 1, 0, 0, 1, 0, 0, 0, 1, 1],
-    [0, 1, 1, 0, 3, 5, 1, 0, 2, 0],
-    [0, 1, 1, 1, 3, 1, 1, 1, 1, 0],
-    [6, 5, 0, 0, 0, 0, 0, 0, 0, 0],
-    [1, 1, 4, 1, 1, 1, 1, 1, 1, 0],
-    [1, 1, 0, 4, 4, 0, 0, 1, 1, 5],
-    [1, 1, 0, 0, 1, 1, 0, 1, 1, 0],
-    [0, 0, 0, 0, 1, 1, 5, 0, 0, 0],
-    [1, 1, 1, 6, 1, 1, 0, 1, 1, 1]
-]
-
-const start = [2, 8];
-
-const path = aStarSearch(matrix, start);
-console.log(path)

@@ -1,204 +1,86 @@
-/**
-     * Busqueda con amplitud
-     * @param {*} environment 
-     * @param {*} startNode 
-     * @returns 
-     */
-function BFS(environment, startNode) {
-    let tail = [startNode];
-    const visited = new Set();
-    let depth = 1;
-    const totalCountGoals = getTotalCountGoals(environment);
-    let countGoals = 0;
-    let countExpandedNodes = 1;
-    while (tail.length > 0) {
-        const expandedNodes = [];
-        let newTail = [];
-        for (let i = 0; i < tail.length; i++) {
-            const currentNode = tail[i];
-            visited.add(`${currentNode[0]},${currentNode[1]}`);
-            if (environment[currentNode[0]][currentNode[1]] === 6) {
-                countGoals++;
-                environment[currentNode[0]][currentNode[1]] = 0;
-                if (countGoals == totalCountGoals) {
-                    let current = undefined;
-                    const roat = []
-                    for (let i = nodes.length - 1; i > -1; i--) {
-                        const node = nodes[i].node;
-                        if (node[0] == currentNode[0] && node[1] == currentNode[1]) {
-                            current = nodes[i];
-                            roat.push(current.node);
-                            break;
-                        }
-                    }
-                    for (let i = nodes.length - 1; i > -1; i--) {
-                        const father = nodes[i].node;
-                        const node = current.father.node;
-                        if (father[0] == node[0] && father[1] == node[1]) {
-                            current = nodes[i];
-                            roat.unshift(current.node);
-                        }
-                    }
-                    roat.unshift(current.father.node)
-                    return {
-                        camino: roat,
-                        profundidad: depth,
-                        nodosExpandidos: countExpandedNodes,
-                        fathers: nodes
-                    };
-                } else {
-                    visited.clear();
-                    visited.add(`${currentNode[0]},${currentNode[1]}`);
-                    newTail = [currentNode];
-                    break;
-                }
-            } else if (environment[currentNode[0]][currentNode[1]] !== 1) {
-                newTail.push(currentNode);
+
+
+function searchDFS() {
+    const startPos = getStartPoint(environment);
+    if (startPos) {
+        console.log("Busqueda por Profundidad");
+        let t1 = performance.now();
+        const nodes = [];
+        const rows = environment.length;
+        const cols = environment[0].length;
+        let totalGoals = getTotalCountGoals(environment);
+        const matrixVisited = Array.from({ length: rows }, () =>
+            Array.from({ length: cols }, () => false)
+        );
+        const result = DFS(environment, startPos, matrixVisited, 0, totalGoals, rows, cols, nodes);
+        let t2 = performance.now();
+        let txtSolution = `Road time: ${t2 - t1} ms\n`;
+        console.log(result.camino);
+        for (const key in result) {
+            if(key != "camino"){
+                txtSolution += `${key}: ${result[key]}\n`;
             }
         }
-        tail = newTail;
-        for (let i = 0; i < tail.length; i++) {
-            const currentNode = tail[i];
-            if (currentNode[0] > 0 && !visited.has(`${currentNode[0] - 1},${currentNode[1]}`)) {//izquierda
-                const node = new Node([currentNode[0] - 1, currentNode[1]]);
-                node.insertFather(new Node(currentNode));
-                nodes.push(node);
-                expandedNodes.push([currentNode[0] - 1, currentNode[1]])
-                countExpandedNodes++;
-            }
-            if (currentNode[0] < 9 && !visited.has(`${currentNode[0] + 1},${currentNode[1]}`)) {//derecha
-                const node = new Node([currentNode[0] + 1, currentNode[1]]);
-                node.insertFather(new Node(currentNode));
-                nodes.push(node);
-                expandedNodes.push([currentNode[0] + 1, currentNode[1]])
-                countExpandedNodes++;
-            }
-            if (currentNode[1] > 0 && !visited.has(`${currentNode[0]},${currentNode[1] - 1}`)) {//arriba
-                const node = new Node([currentNode[0], currentNode[1] - 1]);
-                node.insertFather(new Node(currentNode));
-                nodes.push(node);
-                expandedNodes.push([currentNode[0], currentNode[1] - 1])
-                countExpandedNodes++;
-            }
-            if (currentNode[1] < 9 && !visited.has(`${currentNode[0]},${currentNode[1] + 1}`)) {//abajo
-                const node = new Node([currentNode[0], currentNode[1] + 1]);
-                node.insertFather(new Node(currentNode));
-                nodes.push(node);
-                expandedNodes.push([currentNode[0], currentNode[1] + 1])
-                countExpandedNodes++;
-            }
-        }
-        if (expandedNodes.length > 0) {
-            depth++;
-        }
-        tail = expandedNodes;
+        document.getElementById("solution").innerText = txtSolution;
+        showSolution(result.camino, 0);
+    } else {
+        alert("No se encontro el punto de partida");
     }
-    return false;
 }
 
+function DFS(environment, currentNode, matrixVisited, goals, countTotalGoals, rows, cols, nodes) {
+    matrixVisited[currentNode[0]][currentNode[1]] = true;
 
-public static List<Nodo> busquedaPorProfundidad(int[][] matriz) {
-
-    int n = matriz.length;
-    int m = matriz[0].length;
-    boolean[][] visitado = new boolean[n][m];
-    Stack<Nodo> pila = new Stack<>();
-    List<Nodo> nodosExpandidos = new ArrayList<>();
-    List<Nodo> path = new ArrayList<>();
-    int nEsferas = 0;
-    Nodo nodoInicial = new Nodo(2, 8, 0, null);
-    pila.push(nodoInicial);
-    nodosExpandidos.add(nodoInicial);
-    visitado[0][0] = true;
-
-    while (!pila.empty()) {
-        Nodo nodoActual = pila.pop();
-
-        if (matriz[nodoActual.x][nodoActual.y] == 6) {
-
-            nEsferas++;
-            pila.clear();
-            pila.push(nodoActual);
-
-            System.out.println("Goku encontró la Esfera del Dragón en la posición (" + nodoActual.x + ", " + nodoActual.y + ")");
-
-            System.out.println("Nodos expandidos: " + nodosExpandidos.size());
-            for (Nodo nodosExpandido : nodosExpandidos) {
-                System.out.print("[" + nodosExpandido.x + "," + nodosExpandido.y + "]");
-            }
-            System.out.println("");
-            System.out.println("Profundidad del árbol: " + nodoActual.level);
-
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < m; j++) {
-                    if (visitado[i][j] == true) {
-                        System.out.print("0 ");
-                    } else {
-                        System.out.print("1 ");
-                    }
-                }
-                System.out.println();
-            }
-            System.out.println("");
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < m; j++) {
-                    visitado[i][j] = false;
-                }
-            }
-
-            visitado[nodoActual.x][nodoActual.y] = true;
-            matriz[nodoActual.x][nodoActual.y] = 0;
-            Nodo nodoCamino = nodoActual;
-
-            while (nodoCamino != null) {
-                path.add(nodoCamino);
-                nodoCamino = nodoCamino.parent;
-            }
-
-            Collections.reverse(path);
-            System.out.print("Camino: ");
-
-            for (int i = 0; i < path.size(); i++) {
-                System.out.print("[" + path.get(i).x + "," + path.get(i).y + "]");
-            }
-            System.out.println("");
-            //cola.add(new Nodo(nodoActual.x, nodoActual.y, nodoActual.level));
-            if (nEsferas == 2) {
-                System.out.println("Goku ha encontrado las 2 esferas del Dragón");
-
-                return path;
-            }
-            path.clear();
-        }
-        // Agrega los nodos hijos a la pila
-        if (nodoActual.x > 0 && !visitado[nodoActual.x - 1][nodoActual.y] && matriz[nodoActual.x - 1][nodoActual.y] != 1) {
-            visitado[nodoActual.x - 1][nodoActual.y] = true;
-            Nodo hijo = new Nodo(nodoActual.x - 1, nodoActual.y, nodoActual.level + 1, nodoActual);
-            pila.push(hijo);
-            nodosExpandidos.add(hijo);
-        }
-        if (nodoActual.x < n - 1 && !visitado[nodoActual.x + 1][nodoActual.y] && matriz[nodoActual.x + 1][nodoActual.y] != 1) {
-            visitado[nodoActual.x + 1][nodoActual.y] = true;
-            Nodo hijo = new Nodo(nodoActual.x + 1, nodoActual.y, nodoActual.level + 1, nodoActual);
-            pila.push(hijo);
-            nodosExpandidos.add(hijo);
-        }
-        if (nodoActual.y > 0 && !visitado[nodoActual.x][nodoActual.y - 1] && matriz[nodoActual.x][nodoActual.y - 1] != 1) {
-            visitado[nodoActual.x][nodoActual.y - 1] = true;
-            Nodo hijo = new Nodo(nodoActual.x, nodoActual.y - 1, nodoActual.level + 1, nodoActual);
-            pila.push(hijo);
-            nodosExpandidos.add(hijo);
-        }
-        if (nodoActual.y < m - 1 && !visitado[nodoActual.x][nodoActual.y + 1] && matriz[nodoActual.x][nodoActual.y + 1] != 1) {
-            visitado[nodoActual.x][nodoActual.y + 1] = true;
-            Nodo hijo = new Nodo(nodoActual.x, nodoActual.y + 1, nodoActual.level + 1, nodoActual);
-            pila.push(hijo);
-            nodosExpandidos.add(hijo);
-        }
+    if (environment[currentNode[0]][currentNode[1]] == 1) {
+        return false;
     }
 
-    System.out.println("Goku no pudo encontró Esferas del Dragón");
-    System.out.println("Número de nodos expandidos: " + nodosExpandidos.size());
-    System.out.println("Profundidad del árbol: " + nodosExpandidos.get(nodosExpandidos.size() - 1).level);
-    return path;
+    if (environment[currentNode[0]][currentNode[1]] == 6) {
+        environment[currentNode[0]][currentNode[1]] = 0;
+        goals++;
+        if (goals == countTotalGoals) {
+            let current = undefined;
+            const roat = []
+            for (let i = nodes.length - 1; i > -1; i--) {
+                const node = nodes[i].node;
+                if (node[0] == currentNode[0] && node[1] == currentNode[1]) {
+                    current = nodes[i];
+                    roat.push(current.node);
+                    break;
+                }
+            }
+            for (let i = nodes.length - 1; i > -1; i--) {
+                const father = nodes[i].node;
+                const node = current.father.node;
+                if (father[0] == node[0] && father[1] == node[1]) {
+                    current = nodes[i];
+                    roat.unshift(current.node);
+                }
+            }
+            roat.unshift(current.father.node)
+            return {
+                camino: roat,
+                profundidad: roat.length - 1,
+                totalNodosExpandidos: nodes.length,
+            };
+        } else {
+            matrixVisited = Array.from({ length: rows }, () =>
+                Array.from({ length: cols }, () => false)
+            );
+            matrixVisited[currentNode[0]][currentNode[1]] = true;
+        }
+    }
+    const neighbors = getNeighbors(currentNode, rows, cols);
+    for (let i = neighbors.length - 1; i > -1; i--) {
+        if (!matrixVisited[neighbors[i][0]][neighbors[i][1]]) {
+            const node = new Node(neighbors[i]);
+            node.insertFather(new Node(currentNode));
+            nodes.push(node);
+            const roat = DFS(environment, neighbors[i], matrixVisited, goals, countTotalGoals, rows, cols, nodes)
+            if (roat) {
+                return roat;
+            }
+        }
+    }
+    return false;
 }
